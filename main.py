@@ -1,3 +1,5 @@
+# main.py
+
 import streamlit as st
 from io import BytesIO
 from pathlib import Path
@@ -7,27 +9,41 @@ from src.zip_to_md import extract_zip_to_markdown
 
 st.set_page_config(page_title="ZIP → Markdown", layout="wide")
 
-st.title("📦 ZIP to Markdown Converter")
+st.title("📦 ZIP → Markdown Converter")
 
-uploaded_file = st.file_uploader("Upload your ZIP file", type=["zip"])
+uploaded_files = st.file_uploader(
+    "Upload ZIP files",
+    type="zip",
+    accept_multiple_files=True
+)
 
-if uploaded_file is not None:
-    st.success("ZIP uploaded successfully")
+if uploaded_files:
 
-    zip_bytes = BytesIO(uploaded_file.read())
+    st.write(f"Total ZIPs uploaded: {len(uploaded_files)}")
 
-    if st.button("Convert to Markdown"):
+    for idx, uploaded_file in enumerate(uploaded_files):
+
+        st.divider()
+
+        st.subheader(f"📦 {uploaded_file.name}")
+
+        zip_bytes = BytesIO(uploaded_file.read())
+
         md_text = extract_zip_to_markdown(zip_bytes)
 
-        zip_name = Path(uploaded_file.name or "output").stem
-        output_filename = f"{zip_name}.md"
+        output_filename = f"{Path(uploaded_file.name).stem}.md"
 
-        st.subheader("Preview")
-        st.text_area("Markdown Output", md_text, height=400)
+        st.text_area(
+            label=f"Preview {idx}",
+            value=md_text,
+            height=250,
+            key=f"preview_{idx}"
+        )
 
         st.download_button(
-            label="Download .md file",
+            label=f"Download {output_filename}",
             data=md_text,
             file_name=output_filename,
-            mime="text/markdown"
+            mime="text/markdown",
+            key=f"download_{idx}"
         )

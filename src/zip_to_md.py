@@ -1,14 +1,10 @@
+# zip_to_md.py
+
 from pathlib import Path
 from io import BytesIO
 import zipfile
 
-
 def extract_zip_to_markdown(zip_bytes: BytesIO) -> str:
-    """
-    Pure function:
-    Input: ZIP bytes
-    Output: Markdown string
-    """
 
     with zipfile.ZipFile(zip_bytes, 'r') as z:
         files = [f for f in z.namelist() if not f.endswith('/')]
